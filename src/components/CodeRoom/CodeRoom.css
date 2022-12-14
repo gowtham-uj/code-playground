@@ -1,0 +1,42 @@
+.code-room-wrapper {
+  background-color: #193549;
+}
+
+.editor-options-header {
+  height: 6vh;
+  background-color: #15232d;
+}
+
+.code-editor-comp {
+  padding-top: 5px;
+  height: 50vh;
+  width: 80vw;
+}
+
+.editor-options-header {
+  color: white;
+  display: flex;
+  justify-content: space-around;
+  padding-top: 7px;
+  /* border: 1px solid white; */
+  width: 82vw;
+}
+
+.editor-options-header div {
+  height: 7vh;
+  width: 10vw;
+  z-index: 100;
+}
+
+.lang-select-wrapper select {
+  height: 5vh;
+  width: 100%;
+  border-radius: 0;
+  background: #15232d;
+  color: white;
+  border: none;
+  font-size: 15px;
+  /* border-left: 2px solid #ffc600; */
+  border-bottom: 2px solid #ffc600;
+  outline: none;
+}
