@@ -82,37 +82,35 @@ export default function Editor({
           editorRef.current.setCursor(editorRef.current.lineCount(), 0);
         }
       });
+      socketRef.current.on(ACTIONS.UPDATE_CODE_LANGUAGE, ({ language }) => {
+        console.log(language);
+        if (language) {
+          setSelectedOptions((state) => {
+            return (
+              <motion.select
+                // whileHover={{  }}
+                ref={selectELRef}
+                onChange={(e) => verifyEditorLang(e.target.value)}
+                value={language}
+              >
+                {selectLangOptions.map((el, index, arr) => {
+                  return (
+                    <option value={el.value} key={uuid()}>
+                      {el.text}
+                    </option>
+                  );
+                })}
+              </motion.select>
+            );
+          });
+        }
+      });
     }
 
     return () => {
       socketRef.current.off(ACTIONS.CODE_CHANGE);
     };
   }, [socketRef.current]);
-
-  useEffect(() => {
-    // socketRef.current.on("handle_ECU", (payload) => {
-    //   if (payload.language) {
-    //     setSelectedOptions((state) => {
-    //       return (
-    //         <motion.select
-    //           // whileHover={{  }}
-    //           ref={selectELRef}
-    //           onChange={(e) => verifyEditorLang(e.target.value)}
-    //           value={payload.language}
-    //         >
-    //           {selectLangOptions.map((el, index, arr) => {
-    //             return (
-    //               <option value={el.value} key={uuid()}>
-    //                 {el.text}
-    //               </option>
-    //             );
-    //           })}
-    //         </motion.select>
-    //       );
-    //     });
-    //   }
-    // });
-  }, [socketRef]);
 
   const navigate = useNavigate();
 
@@ -158,11 +156,9 @@ export default function Editor({
   const verifyEditorLang = (newValue) => {
     if (!!editorSupportedLangs[newValue]) {
       setEditorLang(editorSupportedLangs[newValue]);
-      console.log(editorSupportedLangs[newValue]);
-      socketRef.current.emit("update_ECL", {
-        configObj: {
-          ROOM_LANGUAGE: editorSupportedLangs[newValue],
-        },
+      // console.log(editorSupportedLangs[newValue]);
+      socketRef.current.emit(ACTIONS.UPDATE_CODE_LANGUAGE, {
+        language: editorSupportedLangs[newValue],
         roomId: roomId,
       });
       setSelectedOptions((state) => {
