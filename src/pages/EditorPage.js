@@ -136,7 +136,8 @@ const EditorPage = () => {
             Collaborate
           </motion.a>,
         ]}
-        rightLinks={[{ name: "Settings" }, { name: "Go To Dashboard" }]}
+        // rightLinks={[{ name: "Settings" }, { name: "Go To Dashboard" }]}
+        rightLinks={[]}
       />
       <div className="editor-space">
         <div className="aside">
