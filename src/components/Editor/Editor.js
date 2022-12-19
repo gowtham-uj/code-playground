@@ -29,6 +29,7 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 
 import ACTIONS from "../../Actions";
+import OutputTerminal from "../OutputTerminal/OutputTerminal";
 
 export default function Editor({
   socketRef,
@@ -36,11 +37,31 @@ export default function Editor({
   onCodeChange,
   height,
   width,
+  codeRef,
 }) {
   // let { roomId } = useParams();
   // let socketRef = useRef(null);
   // console.log(props.socket);
   const editorRef = useRef(null);
+
+  const navigate = useNavigate();
+
+  const [editorLang, setEditorLang] = useState("javascript");
+  const [editorLangVer, setEditorLangVer] = useState("16.3.0");
+  const [roomConfigData, setRoomConfigData] = useState(null);
+
+  let [editorInstanceId, setEditorInstanceId] = useState(() => {
+    return shortUUID.generate();
+  });
+
+  let selectELRef = useRef(null);
+
+  let [CMInstance, setCMInstance] = useState(null);
+  let [codeOutput, setCodeOutput] = useState(null);
+
+  let [selectLangOptions, setSelectLangOptions] = useState([]);
+  // let [selectedOptions, setSelectedOptions] = useState(null);
+  let [selectedValue, setSelectedValue] = useState("javascript-16.3.0");
 
   useEffect(() => {
     async function init() {
@@ -61,7 +82,12 @@ export default function Editor({
       editorRef.current.on("change", (instance, changes) => {
         const { origin } = changes;
         const code = instance.getValue();
-        onCodeChange(code);
+        // let proccessedEditorLang = selectedValue.split("-");
+        // codeRef.current = { code, language: editorLang };
+        onCodeChange({
+          ...codeRef.current,
+          code: code,
+        });
         if (origin !== "setValue") {
           socketRef.current.emit(ACTIONS.CODE_CHANGE, {
             roomId,
@@ -82,28 +108,40 @@ export default function Editor({
           editorRef.current.setCursor(editorRef.current.lineCount(), 0);
         }
       });
+
+      socketRef.current.emit(ACTIONS.FETCH_AVAILABLE_LANGUAGES, {
+        roomId,
+      });
+
+      socketRef.current.on(ACTIONS.AVAILABLE_LANGUAGES_LIST, ({ data }) => {
+        let denoJavascriptElement = null;
+        let nodeJsOption = null;
+        data.forEach((element, index) => {
+          if (element.language === "javascript" && element.runtime === "deno") {
+            denoJavascriptElement = index;
+          }
+
+          if (element.language === "javascript" && element.runtime === "node") {
+            nodeJsOption = index;
+          }
+        });
+        delete data[denoJavascriptElement];
+        data[nodeJsOption].isDefault = true;
+        setSelectLangOptions(data);
+      });
+
       socketRef.current.on(ACTIONS.UPDATE_CODE_LANGUAGE, ({ language }) => {
-        console.log(language);
-        if (language) {
-          setSelectedOptions((state) => {
-            return (
-              <motion.select
-                // whileHover={{  }}
-                ref={selectELRef}
-                onChange={(e) => verifyEditorLang(e.target.value)}
-                value={language}
-              >
-                {selectLangOptions.map((el, index, arr) => {
-                  return (
-                    <option value={el.value} key={uuid()}>
-                      {el.text}
-                    </option>
-                  );
-                })}
-              </motion.select>
-            );
-          });
-        }
+        let procLang = language.split("-");
+        onCodeChange({
+          code: null,
+          language: procLang[0],
+          version: procLang[1],
+        });
+        setSelectedValue(language);
+      });
+      socketRef.current.on(ACTIONS.SHOW_OUTPUT, ({ output }) => {
+        if (!output) return;
+        setCodeOutput(output);
       });
     }
 
@@ -112,127 +150,85 @@ export default function Editor({
     };
   }, [socketRef.current]);
 
-  const navigate = useNavigate();
-
-  const [editorLang, setEditorLang] = useState("javascript");
-  const [roomConfigData, setRoomConfigData] = useState(null);
-
-  let [editorInstanceId, setEditorInstanceId] = useState(() => {
-    return shortUUID.generate();
-  });
-
-  let selectELRef = useRef(null);
-
-  let [CMInstance, setCMInstance] = useState(null);
-
-  let selectLangOptions = [
-    { value: "javascript", text: "Javascript" },
-    { value: "python", text: "Python" },
-    { value: "go", text: "Go" },
-    { value: "swift", text: "Swift" },
-    { value: "rust", text: "Rust" },
-    { value: "css", text: "Css" },
-    { value: "sql", text: "Sql" },
-    { value: "markdown", text: "Markdown" },
-  ];
-
-  let [selectedOptions, setSelectedOptions] = useState(null);
-  const editorSupportedLangs = {
-    javascript: "javascript",
-    python: "python",
-    swift: "swift",
-    go: "go",
-    php: "php",
-    markdown: "markdown",
-    rust: "rust",
-    sql: "sql",
-    css: "css",
-  };
-
-  // let configUpdateMutation = useMutation({
-  //   mutationFn: updateRoomConfig,
-  // });
-
   const verifyEditorLang = (newValue) => {
-    if (!!editorSupportedLangs[newValue]) {
-      setEditorLang(editorSupportedLangs[newValue]);
-      // console.log(editorSupportedLangs[newValue]);
-      socketRef.current.emit(ACTIONS.UPDATE_CODE_LANGUAGE, {
-        language: editorSupportedLangs[newValue],
-        roomId: roomId,
-      });
-      setSelectedOptions((state) => {
-        return (
-          <motion.select
-            // whileHover={{  }}
-            ref={selectELRef}
-            onChange={(e) => verifyEditorLang(e.target.value)}
-            // defaultValue="javascript"
-            value={newValue}
-          >
-            {selectLangOptions.map((el, index, arr) => {
-              return (
-                <option value={el.value} key={uuid()}>
-                  {el.text}
-                </option>
-              );
-            })}
-          </motion.select>
-        );
-      });
-    }
+    // console.log(newValue);
+    let extractedLangVer = newValue.split("-");
+    setEditorLang(extractedLangVer[0]);
+    setEditorLangVer(extractedLangVer[1]);
+    socketRef.current.emit(ACTIONS.UPDATE_CODE_LANGUAGE, {
+      language: newValue,
+      roomId: roomId,
+    });
+    // console.log(extractedLangVer);
+    onCodeChange({
+      code: null,
+      language: extractedLangVer[0],
+      version: extractedLangVer[1],
+    });
   };
 
   useEffect(() => {
     async function init() {
-      // console.log(cmIns);
+      if (socketRef.current) {
+        // emit FETCH_AVAILABLE_LANGUAGES event to server
+        socketRef.current.emit(ACTIONS.FETCH_AVAILABLE_LANGUAGES, {
+          roomId,
+        });
 
-      // let fetchedConfigs = await fetchRoomConfig(roomId);
-
-      // console.log(fetchedConfigs.roomConfig.ROOM_LANGUAGE);
-
-      // cmIns.setMode
-      // cmIns.setOption("mode", fetchedConfigs.roomConfig.ROOM_LANGUAGE);
-
-      // setCMInstance(cmIns);
-      setSelectedOptions((state) => {
-        return (
-          <motion.select
-            // whileHover={{  }}
-            ref={selectELRef}
-            onChange={(e) => verifyEditorLang(e.target.value)}
-            // defaultValue="javascript"
-            // value={fetchedConfigs.roomConfig.ROOM_LANGUAGE}
-          >
-            {selectLangOptions.map((el, index, arr) => {
-              return (
-                <option value={el.value} key={uuid()}>
-                  {el.text}
-                </option>
-              );
-            })}
-          </motion.select>
-        );
-      });
+        // server will handel it and send the actual data by firing a another event to the client with the data - event name : AVAILABLE_LANGUAGES_LIST
+        // client takes the data and it will change the state of selectedLangs state , the event handler will be on top of the component.
+      }
 
       // console.log(selectELRef.current.value);
     }
     init();
-  }, []);
+  }, [socketRef.current]);
 
   return (
     <>
       <div className="editor-options-header">
-        <div className="lang-select-wrapper">{selectedOptions}</div>
+        <div className="lang-select-wrapper">
+          <motion.select
+            // whileHover={{  }}
+            ref={selectELRef}
+            onChange={(e) => {
+              verifyEditorLang(e.target.value);
+              setSelectedValue(e.target.value);
+            }}
+            value={selectedValue}
+            className="language-selector"
+          >
+            {selectLangOptions.map((el, index, arr) => {
+              return (
+                <option
+                  value={`${el.language}-${el.version}`}
+                  key={uuid()}
+                  // selected={el.language === "javascript" ? true : false}
+                >
+                  {`${el.language} (${el.version})`}
+                </option>
+              );
+            })}
+          </motion.select>
+        </div>
+
         {/* <div>languages</div>
         <div>languages</div>
         <div>languages</div>
         div>languages</.div> */}
       </div>
-      <textarea
-        id={editorInstanceId}
-        // style={{ height: `${props.height}`, width: `${props.width}` }}
-      ></textarea>
+      <div className="editor-wrapper">
+        <textarea id={editorInstanceId}></textarea>
+        {!!codeOutput ? (
+          <OutputTerminal
+            outTerminalCssId="output-terminal"
+            language={`${codeOutput.language} (${codeOutput.version})`}
+            outputObj={codeOutput.run}
+          />
+        ) : (
+          false
+        )}
+      </div>
     </>
   );
 }

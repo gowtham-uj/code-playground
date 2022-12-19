@@ -51,11 +51,12 @@ export default function CodeRoom(props) {
     <div className="code-room-wrapper">
       <div className="code-editor-comp">
         <Editor
-          height="81vh"
-          width="82vw"
+          height="81.6vh"
+          width="83vw"
           socketRef={props.socketRef}
           roomId={props.roomId}
           onCodeChange={props.onCodeChange}
+          codeRef={props.codeRef}
         ></Editor>
       </div>
     </div>

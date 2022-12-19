@@ -1,0 +1,77 @@
+.out-wrapper-div-xyz {
+  height: 50vh;
+  width: 82vw;
+  border-top: 1.5px solid #ffcc00;
+  /* margin-bottom: 0.5vh; */
+  /* matgin-top: 0.5vh; */
+  color: white;
+  /* font-weight: bold; */
+  font-size: 1em;
+  background: #07080a;
+}
+
+.editor-wrapper {
+  height: 85vh;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+}
+/*
+.code-editor-comp {
+} */
+
+.output-terminal-header {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-bottom: 1.5px solid #ffcc00;
+  text-align: center;
+  word-spacing: 2px;
+  letter-spacing: 1px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.output-header-text {
+  display: inline-block;
+  width: 70%;
+}
+.output-language-text-wrapper {
+  display: inline-block;
+  width: 30%;
+  font-size: 16px;
+  text-align: right;
+  /* padding: 0.5rem; */
+  letter-spacing: 1px;
+}
+
+/* 72f0ff */
+.output-language-text {
+  color: #72f0ff;
+  font-size: 18px;
+  text-transform: capitalize;
+  font-weight: semi-bold;
+}
+
+.output-code-text-wrapper {
+  font-size: 17px;
+  padding: 1rem;
+  overflow: scroll;
+  height: 75%;
+  width: 98%;
+  /* scrollbar-width: thin; */
+}
+
+.output-code-text-success {
+  color: green;
+  font-weight: 600;
+  margin-top: 1vh;
+  margin-bottom: 2vh;
+}
+
+.output-code-text-error {
+  font-weight: 600;
+  margin-top: 1vh;
+  margin-bottom: 2vh;
+  color: red;
+}

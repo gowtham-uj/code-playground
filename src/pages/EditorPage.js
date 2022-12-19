@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import ACTIONS from "../Actions";
 import Client from "../components/Client";
-import Editor from "../components/Editor";
 import CodeRoom from "../components/CodeRoom/CodeRoom";
 import AppHeader from "../components/AppHeader/AppHeader";
 
@@ -64,11 +63,6 @@ const EditorPage = () => {
           return prev.filter((client) => client.socketId !== socketId);
         });
       });
-      // socketRef.current.on("handle_ECU", (payload) => {
-      //   if (payload.language) {
-
-      //   }
-      // });
     };
     init();
     return () => {
@@ -96,37 +90,53 @@ const EditorPage = () => {
     return <Navigate to="/" />;
   }
 
+  const runClickHandler = async () => {
+    if (!socketRef.current) return;
+    console.log(codeRef.current);
+    socketRef.current.emit(ACTIONS.RUN_CODE, {
+      roomId: roomId,
+      code: codeRef.current.code,
+      language: !codeRef.current.language
+        ? "javascript"
+        : codeRef.current.language,
+      version: !codeRef.current.version ? "16.3.0" : codeRef.current.version,
+    });
+  };
+
   return (
     <div className="mainWrap">
       <AppHeader
         leftLinks={[
           <motion.a
-            href="#"
-            // onClick={(e) => runClickHandler(e)}
-            whileHover={{ borderBottom: "4px solid #ffc600" }}
+            onClick={(e) => runClickHandler(e)}
+            whileHover={{
+              borderBottom: "4px solid #ffc600",
+              cursor: "pointer",
+            }}
             key={shortUid.generate()}
           >
             Run
           </motion.a>,
           <motion.a
-            href="#"
             key={shortUid.generate()}
-            whileHover={{ borderBottom: "4px solid #ffc600" }}
+            whileHover={{
+              borderBottom: "4px solid #ffc600",
+              cursor: "pointer",
+            }}
           >
             Save
           </motion.a>,
           <motion.a
-            href="#"
             key={shortUid.generate()}
-            whileHover={{ borderBottom: "4px solid #ffc600" }}
+            whileHover={{
+              borderBottom: "4px solid #ffc600",
+              cursor: "pointer",
+            }}
           >
             Collaborate
           </motion.a>,
         ]}
-        rightLinks={[
-          { name: "Settings", href: "#" },
-          { name: "Go To Dashboard", href: "#" },
-        ]}
+        rightLinks={[{ name: "Settings" }, { name: "Go To Dashboard" }]}
       />
       <div className="editor-space">
         <div className="aside">
@@ -150,8 +160,10 @@ const EditorPage = () => {
             socketRef={socketRef}
             roomId={roomId}
             onCodeChange={(code) => {
+              // console.log(code);
               codeRef.current = code;
             }}
+            codeRef={codeRef}
           />
         </div>
       </div>

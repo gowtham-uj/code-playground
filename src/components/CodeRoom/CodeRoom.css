@@ -8,9 +8,8 @@
 }
 
 .code-editor-comp {
-  padding-top: 5px;
-  height: 50vh;
-  width: 80vw;
+  height: auto;
+  width: 84vw;
 }
 
 .editor-options-header {
@@ -30,7 +29,7 @@
 
 .lang-select-wrapper select {
   height: 5vh;
-  width: 100%;
+  width: fit-content;
   border-radius: 0;
   background: #15232d;
   color: white;
@@ -39,4 +38,8 @@
   /* border-left: 2px solid #ffc600; */
   border-bottom: 2px solid #ffc600;
   outline: none;
+}
+
+.mainWrap {
+  overflow-x: hidden;
 }
