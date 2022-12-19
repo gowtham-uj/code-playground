@@ -56,10 +56,11 @@
 .output-code-text-wrapper {
   font-size: 17px;
   padding: 1rem;
-  overflow: scroll;
+  overflow-y: scroll;
   height: 75%;
   width: 98%;
-  /* scrollbar-width: thin; */
+  scrollbar-width: thin;
+  overflow-wrap: break-word;
 }
 
 .output-code-text-success {
