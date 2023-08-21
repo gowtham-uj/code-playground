@@ -114,7 +114,9 @@ io.use(async (socket, next) => {
   let userAuthData = await verifyJwtToken(token);
   if (!!userAuthData) {
     socket.disconnect(true);
+    next(new Error("invalid auth"));
   }
+  socket.userData = userAuthData;
   next();
 });
 
@@ -132,7 +134,14 @@ io.on("connection", (socket) => {
         roomLanguage: "",
       });
 
-      room.users = [{ username, socketId: socket.id, creator: true }];
+      room.users = [
+        {
+          username,
+          socketId: socket.id,
+          creator: true,
+          userId: socket.userData.userId,
+        },
+      ];
 
       await room.save();
       // join this socket into the new room
@@ -173,7 +182,10 @@ io.on("connection", (socket) => {
     // console.log(room);
 
     // add user to the room
-    room.users = [...room.users, { username, socketId: socket.id }];
+    room.users = [
+      ...room.users,
+      { username, socketId: socket.id, userId: socket.userData.userId },
+    ];
     room.save();
 
     // join the new socket in the room
