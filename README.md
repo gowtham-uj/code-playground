@@ -3,3 +3,7 @@ This is a realtime collaborative code editor with code execution for support ove
 
 Here is the Live demo to test the application:
 https://code-editor-with-code-exec.onrender.com/
+
+testing user credentials: 
+email: test1@gmail.com
+password: 123456
