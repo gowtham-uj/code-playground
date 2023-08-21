@@ -109,11 +109,13 @@ export default function Editor({
         }
       });
 
+      console.log("emmting the code lang fetch event");
       socketRef.current.emit(ACTIONS.FETCH_AVAILABLE_LANGUAGES, {
         roomId,
       });
 
       socketRef.current.on(ACTIONS.AVAILABLE_LANGUAGES_LIST, ({ data }) => {
+        console.log(data);
         let denoJavascriptElement = null;
         let nodeJsOption = null;
         data.forEach((element, index) => {
@@ -128,6 +130,8 @@ export default function Editor({
         delete data[denoJavascriptElement];
         data[nodeJsOption].isDefault = true;
         setSelectLangOptions(data);
+
+        socketRef.current.emit(ACTIONS.SYNC_PREV_ROOM_STATE, roomId);
       });
 
       socketRef.current.on(ACTIONS.UPDATE_CODE_LANGUAGE, ({ language }) => {
@@ -137,7 +141,32 @@ export default function Editor({
           language: procLang[0],
           version: procLang[1],
         });
+        console.log(language);
         setSelectedValue(language);
+      });
+
+      socketRef.current.on(ACTIONS.INITIAL_SYNC_DATA, (roomState) => {
+        console.log(roomState);
+        if (!!roomState.roomLanguage) {
+          console.log("hello1");
+          let procLang = roomState.roomLanguage.split("-");
+          onCodeChange({
+            code: null,
+            language: procLang[0],
+            version: procLang[1],
+          });
+          setSelectedValue(roomState.roomLanguage);
+        }
+        if (!!roomState.codeChanges) {
+          console.log("hello2");
+          editorRef.current.focus();
+          editorRef.current.setValue(roomState.codeChanges);
+          editorRef.current.setCursor(editorRef.current.lineCount(), 0);
+        }
+        if (!!roomState.codeOutput) {
+          console.log("hello3");
+          setCodeOutput(roomState.codeOutput);
+        }
       });
       socketRef.current.on(ACTIONS.SHOW_OUTPUT, ({ output }) => {
         if (!output) return;
@@ -155,7 +184,7 @@ export default function Editor({
     let extractedLangVer = newValue.split("-");
     setEditorLang(extractedLangVer[0]);
     setEditorLangVer(extractedLangVer[1]);
-    socketRef.current.emit(ACTIONS.UPDATE_CODE_LANGUAGE, {
+    socketRef.current.emit(ACTIONS.LANG_CHANGE, {
       language: newValue,
       roomId: roomId,
     });
@@ -183,6 +212,10 @@ export default function Editor({
     }
     init();
   }, [socketRef.current]);
+
+  // useEffect(() => {
+  //   socketRef.current.emit(ACTIONS.LANG_CHANGE, selectedValue);
+  // }, [selectedValue]);
 
   return (
     <>

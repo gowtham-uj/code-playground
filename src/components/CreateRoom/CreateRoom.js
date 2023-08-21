@@ -1,31 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { v4 as uuidV4 } from "uuid";
 import toast from "react-hot-toast";
-import { useNavigate, useLocation } from "react-router-dom";
-import store from "../store/store";
-import { useSelector, useDispatch } from "react-redux";
-import { replace } from "lodash";
+import { useNavigate } from "react-router-dom";
 
-const Home = () => {
+const CreateRoom = () => {
   const navigate = useNavigate();
 
-  const authState = useSelector((state) => state.auth);
   const [roomId, setRoomId] = useState("");
-  const location = useLocation();
   const [username, setUsername] = useState("");
-
-  useEffect(() => {
-    if (authState.isLoggedIn === false) {
-      navigate("/");
-    }
-  }, [authState]);
-
-  const createNewRoom = (e) => {
+  const createNewRoomId = (e) => {
     e.preventDefault();
-    navigate("/create-room");
+    const id = uuidV4();
+    setRoomId(id);
+    toast.success("Generated A New Room Id");
   };
 
-  const joinRoom = () => {
+  const createRoom = () => {
     if (!roomId || !username) {
       toast.error("ROOM ID & username is required");
       return;
@@ -35,18 +25,14 @@ const Home = () => {
     navigate(`/editor/${roomId}`, {
       state: {
         username,
-        fromPage: "join-room",
+        fromPage: "create-room",
       },
     });
   };
 
-  if (!!location.state?.toastMsg) {
-    toast.success(location.state?.toastMsg);
-  }
-
   const handleInputEnter = (e) => {
     if (e.code === "Enter") {
-      joinRoom();
+      createRoom();
     }
   };
   return (
@@ -57,8 +43,7 @@ const Home = () => {
           src="/code-sync.png"
           alt="code-sync-logo"
         />
-        <h2 style={{ textAlign: "center" }}>Join Room</h2>
-        <h4 className="mainLabel">Paste invitation ROOM ID</h4>
+        <h2 style={{ textAlign: "center" }}>Create A New Room </h2>
         <div className="inputGroup">
           <input
             type="text"
@@ -76,18 +61,14 @@ const Home = () => {
             value={username}
             onKeyUp={handleInputEnter}
           />
-          <button
-            className="btn joinBtn"
-            onClick={joinRoom}
-            style={{ width: "100%" }}
-          >
-            Join
-          </button>
           <span className="createInfo">
-            If you don't have invite code then you can create a new room
+            To auto generate the room id &nbsp;
+            <a onClick={createNewRoomId} href className="createNewBtn">
+              click here
+            </a>
             <button
               className="btn joinBtn"
-              onClick={createNewRoom}
+              onClick={createRoom}
               style={{
                 width: "100%",
               }}
@@ -101,4 +82,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default CreateRoom;

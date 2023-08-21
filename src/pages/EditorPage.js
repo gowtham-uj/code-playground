@@ -5,6 +5,8 @@ import Client from "../components/Client";
 import CodeRoom from "../components/CodeRoom/CodeRoom";
 import AppHeader from "../components/AppHeader/AppHeader";
 
+import { useSelector, useDispatch } from "react-redux";
+
 import { initSocket } from "../socket";
 import {
   useLocation,
@@ -22,10 +24,12 @@ const EditorPage = () => {
   const { roomId } = useParams();
   const reactNavigator = useNavigate();
   const [clients, setClients] = useState([]);
+  const [isRoomCreator, setIsRoomCreator] = useState(false);
+  const authState = useSelector((state) => state.auth);
 
   useEffect(() => {
     const init = async () => {
-      socketRef.current = await initSocket();
+      socketRef.current = await initSocket(authState.user.jwtToken);
       socketRef.current.on("connect_error", (err) => handleErrors(err));
       socketRef.current.on("connect_failed", (err) => handleErrors(err));
 
@@ -35,10 +39,28 @@ const EditorPage = () => {
         reactNavigator("/");
       }
 
-      socketRef.current.emit(ACTIONS.JOIN, {
-        roomId,
-        username: location.state?.username,
-      });
+      if (location.state?.fromPage === "create-room") {
+        socketRef.current.emit(ACTIONS.CREATE_ROOM, {
+          roomId,
+          username: location.state?.username,
+        });
+      }
+
+      if (location.state?.fromPage === "join-room") {
+        socketRef.current.emit(ACTIONS.JOIN, {
+          roomId,
+          username: location.state?.username,
+        });
+      }
+
+      if (authState.isLoggedIn === false) {
+        reactNavigator("/");
+      }
+
+      // socketRef.current.emit(ACTIONS.SYNC_CODE, {
+      //   code: codeRef.current,
+      //   socketId,
+      // });
 
       // Listening for joined event
       socketRef.current.on(
@@ -49,12 +71,31 @@ const EditorPage = () => {
             console.log(`${username} joined`);
           }
           setClients(clients);
-          socketRef.current.emit(ACTIONS.SYNC_CODE, {
-            code: codeRef.current,
-            socketId,
-          });
         }
       );
+      // listening for new-room-created event
+      socketRef.current.on(
+        ACTIONS.ROOM_CREATED,
+        ({ clients, username, socketId, isCreator }) => {
+          setClients(clients);
+          if (isCreator === true) {
+            setIsRoomCreator(true);
+          }
+        }
+      );
+      //listening for invalid room id event
+      socketRef.current.on(ACTIONS.INVALID_ROOM_ID, () => {
+        reactNavigator("/");
+      });
+
+      // if room is deleted
+      socketRef.current.on(ACTIONS.ROOM_DELETED, () => {
+        reactNavigator(`/`, {
+          state: {
+            toastMsg: "You Successfully Deleted The Room.",
+          },
+        });
+      });
 
       // Listening for disconnected
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
@@ -83,6 +124,7 @@ const EditorPage = () => {
   }
 
   function leaveRoom() {
+    socketRef.current.emit(ACTIONS.LEAVE_ROOM, roomId);
     reactNavigator("/");
   }
 
@@ -92,7 +134,6 @@ const EditorPage = () => {
 
   const runClickHandler = async () => {
     if (!socketRef.current) return;
-    console.log(codeRef.current);
     socketRef.current.emit(ACTIONS.RUN_CODE, {
       roomId: roomId,
       code: codeRef.current.code,
@@ -102,43 +143,59 @@ const EditorPage = () => {
       version: !codeRef.current.version ? "16.3.0" : codeRef.current.version,
     });
   };
+  const destroyRoom = async () => {
+    if (!socketRef.current) return;
+    socketRef.current.emit(ACTIONS.DESTROY_ROOM, roomId);
+  };
 
   return (
     <div className="mainWrap">
-      <AppHeader
-        leftLinks={[
-          <motion.a
-            onClick={(e) => runClickHandler(e)}
-            whileHover={{
-              borderBottom: "4px solid #ffc600",
-              cursor: "pointer",
-            }}
-            key={shortUid.generate()}
-          >
-            Run
-          </motion.a>,
-          <motion.a
-            key={shortUid.generate()}
-            whileHover={{
-              borderBottom: "4px solid #ffc600",
-              cursor: "pointer",
-            }}
-          >
-            Save
-          </motion.a>,
-          <motion.a
-            key={shortUid.generate()}
-            whileHover={{
-              borderBottom: "4px solid #ffc600",
-              cursor: "pointer",
-            }}
-          >
-            Collaborate
-          </motion.a>,
-        ]}
-        // rightLinks={[{ name: "Settings" }, { name: "Go To Dashboard" }]}
-        rightLinks={[]}
-      />
+      {isRoomCreator === true ? (
+        <AppHeader
+          leftLinks={[
+            <motion.a
+              onClick={(e) => runClickHandler(e)}
+              whileHover={{
+                borderBottom: "4px solid #ffc600",
+                cursor: "pointer",
+              }}
+              key={shortUid.generate()}
+            >
+              Run
+            </motion.a>,
+            <motion.a
+              onClick={destroyRoom}
+              key={shortUid.generate()}
+              whileHover={{
+                borderBottom: "4px solid #ffc600",
+                cursor: "pointer",
+              }}
+            >
+              Destroy The Room
+            </motion.a>,
+          ]}
+          // rightLinks={[{ name: "Settings" }, { name: "Go To Dashboard" }]}
+          rightLinks={[]}
+        />
+      ) : (
+        <AppHeader
+          leftLinks={[
+            <motion.a
+              onClick={(e) => runClickHandler(e)}
+              whileHover={{
+                borderBottom: "4px solid #ffc600",
+                cursor: "pointer",
+              }}
+              key={shortUid.generate()}
+            >
+              Run
+            </motion.a>,
+          ]}
+          // rightLinks={[{ name: "Settings" }, { name: "Go To Dashboard" }]}
+          rightLinks={[]}
+        />
+      )}
+
       <div className="editor-space">
         <div className="aside">
           <div className="asideInner">
