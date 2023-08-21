@@ -4,6 +4,8 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const path = require("path");
+const cors = require("cors");
+
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 
@@ -30,6 +32,13 @@ const {
 
 const server = http.createServer(app);
 const io = new Server(server);
+
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+app.options("*", cors());
 
 app.use(express.static("build"));
 app.use(morgan("tiny"));
