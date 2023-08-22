@@ -109,16 +109,6 @@ function getAllConnectedClients(roomId, users) {
 }
 
 // auth middleware for socket communications
-io.use(async (socket, next) => {
-  const token = socket.handshake.auth.token;
-  let userAuthData = await verifyJwtToken(token);
-  if (!!userAuthData) {
-    socket.disconnect(true);
-    next(new Error("invalid auth"));
-  }
-  socket.userData = userAuthData;
-  next();
-});
 
 io.on("connection", (socket) => {
   // action create room
@@ -139,7 +129,6 @@ io.on("connection", (socket) => {
           username,
           socketId: socket.id,
           creator: true,
-          userId: socket.userData.userId,
         },
       ];
 
@@ -182,10 +171,7 @@ io.on("connection", (socket) => {
     // console.log(room);
 
     // add user to the room
-    room.users = [
-      ...room.users,
-      { username, socketId: socket.id, userId: socket.userData.userId },
-    ];
+    room.users = [...room.users, { username, socketId: socket.id }];
     room.save();
 
     // join the new socket in the room
