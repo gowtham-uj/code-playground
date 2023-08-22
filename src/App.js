@@ -62,8 +62,14 @@ function App() {
               element={<MagicLogin title="Magic Login" />}
             ></Route>
             <Route path="/home" element={<Home />}></Route>
-            <Route path="/create-room" element={<CreateRoom />}></Route>
-            <Route path="/editor/:roomId" element={<EditorPage />}></Route>
+            <Route
+              path="/create-room"
+              element={<CreateRoom title="Create Room" />}
+            ></Route>
+            <Route
+              path="/editor/:roomId"
+              element={<EditorPage title="Code Playground" />}
+            ></Route>
           </Routes>
         </BrowserRouter>
       </Provider>

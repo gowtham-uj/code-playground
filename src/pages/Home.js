@@ -6,7 +6,7 @@ import store from "../store/store";
 import { useSelector, useDispatch } from "react-redux";
 import { replace } from "lodash";
 
-const Home = () => {
+const Home = (props) => {
   const navigate = useNavigate();
 
   const authState = useSelector((state) => state.auth);
@@ -19,6 +19,10 @@ const Home = () => {
       navigate("/");
     }
   }, [authState]);
+
+  useEffect(() => {
+    document.title = props.title;
+  }, [props.title]);
 
   const createNewRoom = (e) => {
     e.preventDefault();

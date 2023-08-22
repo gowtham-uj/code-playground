@@ -28,6 +28,12 @@ const EditorPage = () => {
   const authState = useSelector((state) => state.auth);
 
   useEffect(() => {
+    if (authState.isLoggedIn === false) {
+      reactNavigator("/");
+    }
+  }, [authState]);
+
+  useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
       socketRef.current.on("connect_error", (err) => handleErrors(err));
