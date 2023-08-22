@@ -78,7 +78,7 @@ const signUp = BigPromise(async (req, res, next) => {
 
   await createdUser.save();
 
-  let conformAccToken = `https://auth-system-h5dp.herokuapp.com/conform-account?token=${conformToken}`;
+  let conformAccToken = `https://code-editor-with-code-exec.onrender.com/conform-account?token=${conformToken}`;
 
   const mailRes = await sendSingleMail({
     From: {

@@ -53,9 +53,9 @@ const EditorPage = () => {
         });
       }
 
-      if (authState.isLoggedIn === false) {
-        reactNavigator("/");
-      }
+      // if (authState.isLoggedIn === false) {
+      //   reactNavigator("/");
+      // }
 
       // socketRef.current.emit(ACTIONS.SYNC_CODE, {
       //   code: codeRef.current,
