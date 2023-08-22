@@ -17,7 +17,7 @@ import {
 import { motion } from "framer-motion";
 import shortUid from "short-uuid";
 
-const EditorPage = () => {
+const EditorPage = (props) => {
   const socketRef = useRef(null);
   const codeRef = useRef(null);
   const location = useLocation();
@@ -32,6 +32,10 @@ const EditorPage = () => {
       reactNavigator("/");
     }
   }, [authState]);
+
+  useEffect(() => {
+    document.title = props.title;
+  }, [props.title]);
 
   useEffect(() => {
     const init = async () => {
@@ -150,7 +154,10 @@ const EditorPage = () => {
     });
   };
   const destroyRoom = async () => {
-    if (!socketRef.current) return;
+    if (!socketRef.current) {
+      console.log("no socket ref , so destroy function not executed");
+      return;
+    }
     socketRef.current.emit(ACTIONS.DESTROY_ROOM, roomId);
   };
 
