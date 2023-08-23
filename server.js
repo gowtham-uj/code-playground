@@ -137,22 +137,21 @@ io.on("connection", (socket) => {
 
       await room.save();
       // join this socket into the new room
-      socket.join(roomId);
+      try {
+        socket.join(roomId);
+      } catch (err) {
+        console.log("from joining the socket to room");
+      }
 
       // get all the current online connected clients
       const clients = getAllConnectedClients(roomId, room.users);
-      try {
-        socket.emit(ACTIONS.ROOM_CREATED, {
-          clients,
-          username,
-          socketId: socket.id,
-          isCreator: true,
-        });
-      } catch (err) {
-        console.log("error from the emit room created event to client");
-      }
+      socket.emit(ACTIONS.ROOM_CREATED, {
+        clients,
+        username,
+        socketId: socket.id,
+        isCreator: true,
+      });
     } catch (err) {
-      console.log("error from create room ", err);
       socket.emit(ACTIONS.INVALID_ROOM_ID);
     }
   });
