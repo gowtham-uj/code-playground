@@ -4,6 +4,8 @@ const express = require("express");
 const app = express();
 const http = require("http");
 const path = require("path");
+const cors = require("cors");
+
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 
@@ -30,6 +32,13 @@ const {
 
 const server = http.createServer(app);
 const io = new Server(server);
+
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+app.options("*", cors());
 
 app.use(express.static("build"));
 app.use(morgan("tiny"));
@@ -100,6 +109,7 @@ function getAllConnectedClients(roomId, users) {
 }
 
 // auth middleware for socket communications
+<<<<<<< HEAD
 // io.use(async (socket, next) => {
 //   const token = socket.handshake.auth.token;
 //   let userAuthData = await verifyJwtToken(token);
@@ -108,10 +118,18 @@ function getAllConnectedClients(roomId, users) {
 //   }
 //   next();
 // });
+=======
+>>>>>>> dfff14ca0514b7b64ff5cef23d9c4175d6b229ad
 
 io.on("connection", (socket) => {
   // action create room
+  socket.on("connect_failed", function () {
+    document.write("Sorry, there seems to be an issue with the connection!");
+  });
 
+  socket.on("error", (err) => {
+    console.log(err);
+  });
   socket.on(ACTIONS.CREATE_ROOM, async ({ roomId, username }) => {
     // console.log("creating a room in db to make it persistent");
     try {
@@ -123,11 +141,21 @@ io.on("connection", (socket) => {
         roomLanguage: "",
       });
 
-      room.users = [{ username, socketId: socket.id, creator: true }];
+      room.users = [
+        {
+          username,
+          socketId: socket.id,
+          creator: true,
+        },
+      ];
 
       await room.save();
       // join this socket into the new room
-      socket.join(roomId);
+      try {
+        socket.join(roomId);
+      } catch (err) {
+        console.log("from joining the socket to room");
+      }
 
       // get all the current online connected clients
       const clients = getAllConnectedClients(roomId, room.users);
@@ -156,7 +184,6 @@ io.on("connection", (socket) => {
 
     if (!room) {
       // socket.emit(ACTIONS.CREATE_ROOM);
-
       socket.emit(ACTIONS.INVALID_ROOM_ID);
       return;
     }
@@ -299,7 +326,7 @@ io.on("connection", (socket) => {
       // make all clients in that room leave , so no active users means the room will be automatically deleted.
       io.to(roomId).emit(ACTIONS.ROOM_DELETED);
       io.in(roomId).socketsLeave(roomId);
-      socket.leave();
+      // socket.leave();
     }
   });
 });

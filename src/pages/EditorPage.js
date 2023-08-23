@@ -17,7 +17,7 @@ import {
 import { motion } from "framer-motion";
 import shortUid from "short-uuid";
 
-const EditorPage = () => {
+const EditorPage = (props) => {
   const socketRef = useRef(null);
   const codeRef = useRef(null);
   const location = useLocation();
@@ -28,8 +28,18 @@ const EditorPage = () => {
   const authState = useSelector((state) => state.auth);
 
   useEffect(() => {
+    if (authState.isLoggedIn === false) {
+      reactNavigator("/");
+    }
+  }, [authState]);
+
+  useEffect(() => {
+    document.title = props.title;
+  }, [props.title]);
+
+  useEffect(() => {
     const init = async () => {
-      socketRef.current = await initSocket(authState.user.jwtToken);
+      socketRef.current = await initSocket();
       socketRef.current.on("connect_error", (err) => handleErrors(err));
       socketRef.current.on("connect_failed", (err) => handleErrors(err));
 
@@ -53,9 +63,9 @@ const EditorPage = () => {
         });
       }
 
-      if (authState.isLoggedIn === false) {
-        reactNavigator("/");
-      }
+      // if (authState.isLoggedIn === false) {
+      //   reactNavigator("/");
+      // }
 
       // socketRef.current.emit(ACTIONS.SYNC_CODE, {
       //   code: codeRef.current,
@@ -144,7 +154,10 @@ const EditorPage = () => {
     });
   };
   const destroyRoom = async () => {
-    if (!socketRef.current) return;
+    if (!socketRef.current) {
+      console.log("no socket ref , so destroy function not executed");
+      return;
+    }
     socketRef.current.emit(ACTIONS.DESTROY_ROOM, roomId);
   };
 
