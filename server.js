@@ -116,6 +116,9 @@ io.on("connection", (socket) => {
     document.write("Sorry, there seems to be an issue with the connection!");
   });
 
+  socket.on("error", (err) => {
+    console.log(err);
+  });
   socket.on(ACTIONS.CREATE_ROOM, async ({ roomId, username }) => {
     // console.log("creating a room in db to make it persistent");
     try {
