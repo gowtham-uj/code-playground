@@ -138,12 +138,16 @@ io.on("connection", (socket) => {
 
       // get all the current online connected clients
       const clients = getAllConnectedClients(roomId, room.users);
-      socket.emit(ACTIONS.ROOM_CREATED, {
-        clients,
-        username,
-        socketId: socket.id,
-        isCreator: true,
-      });
+      try {
+        socket.emit(ACTIONS.ROOM_CREATED, {
+          clients,
+          username,
+          socketId: socket.id,
+          isCreator: true,
+        });
+      } catch (err) {
+        console.log("error from the emit room created event to client");
+      }
     } catch (err) {
       console.log("error from create room ", err);
       socket.emit(ACTIONS.INVALID_ROOM_ID);
@@ -164,7 +168,6 @@ io.on("connection", (socket) => {
 
     if (!room) {
       // socket.emit(ACTIONS.CREATE_ROOM);
-
       socket.emit(ACTIONS.INVALID_ROOM_ID);
       return;
     }
