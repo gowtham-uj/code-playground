@@ -48,8 +48,8 @@ app.use(bodyParser.json());
 // db related code
 (async () => {
   await sequelize.authenticate();
-  await sequelize.sync({ force: true });
-  await devKickStart();
+  // await sequelize.sync({ force: true });
+  // await devKickStart();
   // await authorize;
   // await Room.create({
   //   roomId: "crazy-codes",
