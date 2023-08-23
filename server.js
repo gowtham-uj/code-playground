@@ -112,6 +112,9 @@ function getAllConnectedClients(roomId, users) {
 
 io.on("connection", (socket) => {
   // action create room
+  socket.on("connect_failed", function () {
+    document.write("Sorry, there seems to be an issue with the connection!");
+  });
 
   socket.on(ACTIONS.CREATE_ROOM, async ({ roomId, username }) => {
     // console.log("creating a room in db to make it persistent");
