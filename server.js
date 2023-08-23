@@ -145,6 +145,7 @@ io.on("connection", (socket) => {
         isCreator: true,
       });
     } catch (err) {
+      console.log("error from create room ", err);
       socket.emit(ACTIONS.INVALID_ROOM_ID);
     }
   });

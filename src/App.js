@@ -61,7 +61,10 @@ function App() {
               exact
               element={<MagicLogin title="Magic Login" />}
             ></Route>
-            <Route path="/home" element={<Home />}></Route>
+            <Route
+              path="/home"
+              element={<Home title="Playground - Home" />}
+            ></Route>
             <Route
               path="/create-room"
               element={<CreateRoom title="Create Room" />}
