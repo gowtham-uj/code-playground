@@ -48,8 +48,8 @@ app.use(bodyParser.json());
 // db related code
 (async () => {
   await sequelize.authenticate();
-  // await sequelize.sync({ force: true });
-  // await devKickStart();
+  await sequelize.sync({ force: true });
+  await devKickStart();
   // await authorize;
   // await Room.create({
   //   roomId: "crazy-codes",
@@ -306,7 +306,7 @@ io.on("connection", (socket) => {
       // make all clients in that room leave , so no active users means the room will be automatically deleted.
       io.to(roomId).emit(ACTIONS.ROOM_DELETED);
       io.in(roomId).socketsLeave(roomId);
-      socket.leave();
+      // socket.leave();
     }
   });
 });
