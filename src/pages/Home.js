@@ -14,11 +14,11 @@ const Home = () => {
   const location = useLocation();
   const [username, setUsername] = useState("");
 
-  useEffect(() => {
-    if (authState.isLoggedIn === false) {
-      navigate("/");
-    }
-  }, [authState]);
+  // useEffect(() => {
+  //   if (authState.isLoggedIn === false) {
+  //     navigate("/");
+  //   }
+  // }, [authState]);
 
   const createNewRoom = (e) => {
     e.preventDefault();

@@ -100,20 +100,21 @@ function getAllConnectedClients(roomId, users) {
 }
 
 // auth middleware for socket communications
-io.use(async (socket, next) => {
-  const token = socket.handshake.auth.token;
-  let userAuthData = await verifyJwtToken(token);
-  if (!!userAuthData) {
-    socket.disconnect(true);
-  }
-  next();
-});
+// io.use(async (socket, next) => {
+//   const token = socket.handshake.auth.token;
+//   let userAuthData = await verifyJwtToken(token);
+//   if (!!userAuthData) {
+//     socket.disconnect(true);
+//   }
+//   next();
+// });
 
 io.on("connection", (socket) => {
   // action create room
 
   socket.on(ACTIONS.CREATE_ROOM, async ({ roomId, username }) => {
     // console.log("creating a room in db to make it persistent");
+    console.log("create room");
     try {
       let room = await Room.create({
         roomId: roomId,

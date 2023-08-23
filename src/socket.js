@@ -6,9 +6,6 @@ export const initSocket = async (authToken) => {
     reconnectionAttempt: "Infinity",
     timeout: 10000,
     transports: ["websocket"],
-    auth: {
-      token: authToken,
-    },
   };
   return io("/", options);
 };
