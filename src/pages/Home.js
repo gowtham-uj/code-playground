@@ -14,11 +14,11 @@ const Home = (props) => {
   const location = useLocation();
   const [username, setUsername] = useState("");
 
-  useEffect(() => {
-    if (authState.isLoggedIn === false) {
-      navigate("/");
-    }
-  }, [authState]);
+  // useEffect(() => {
+  //   if (authState.isLoggedIn === false) {
+  //     navigate("/");
+  //   }
+  // }, [authState]);
 
   useEffect(() => {
     document.title = props.title;
