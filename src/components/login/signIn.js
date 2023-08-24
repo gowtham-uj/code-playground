@@ -70,14 +70,14 @@ export default function SignIn(props) {
 
   const displayError = [];
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
-    if (token || user) {
-      navigate("/home");
-    }
-    setUserData(user);
-  }, [userData]);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   const user = localStorage.getItem("user");
+  //   if (token || user) {
+  //     navigate("/home");
+  //   }
+  //   setUserData(user);
+  // }, [userData]);
 
   useEffect(() => {
     document.title = props.title;

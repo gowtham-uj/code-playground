@@ -33,7 +33,7 @@ const Home = (props) => {
     }
     setUserData(user);
     setUsername(user.name);
-  }, [userData]);
+  }, []);
 
   const createNewRoom = (e) => {
     e.preventDefault();
