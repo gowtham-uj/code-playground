@@ -34,7 +34,7 @@ function App() {
       <Provider store={store}>
         <BrowserRouter>
           <Routes>
-            {/* <Route path="/" exact element={<SignIn title="Sign in" />} />
+            <Route path="/" exact element={<SignIn title="Sign in" />} />
             <Route path="/signup" exact element={<SignUp title="Sign Up" />} />
             <Route
               path="/forgot-password"
@@ -60,10 +60,19 @@ function App() {
               path="/magic-login"
               exact
               element={<MagicLogin title="Magic Login" />}
-            ></Route> */}
-            <Route path="/" element={<Home />}></Route>
-            <Route path="/create-room" element={<CreateRoom />}></Route>
-            <Route path="/editor/:roomId" element={<EditorPage />}></Route>
+            ></Route>
+            <Route
+              path="/home"
+              element={<Home title={"Playground - Join Room"} />}
+            ></Route>
+            <Route
+              path="/create-room"
+              element={<CreateRoom title={"Playground - Create Room"} />}
+            ></Route>
+            <Route
+              path="/editor/:roomId"
+              element={<EditorPage title={"Playground - Room"} />}
+            ></Route>
           </Routes>
         </BrowserRouter>
       </Provider>

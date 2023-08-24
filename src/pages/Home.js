@@ -10,6 +10,7 @@ const Home = (props) => {
   const navigate = useNavigate();
 
   const authState = useSelector((state) => state.auth);
+  const [userData, setUserData] = useState("");
   const [roomId, setRoomId] = useState("");
   const location = useLocation();
   const [username, setUsername] = useState("");
@@ -23,6 +24,16 @@ const Home = (props) => {
   useEffect(() => {
     document.title = props.title;
   }, [props.title]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (!token || !user) {
+      navigate("/");
+    }
+    setUserData(user);
+    setUsername(user.name);
+  }, [userData]);
 
   const createNewRoom = (e) => {
     e.preventDefault();

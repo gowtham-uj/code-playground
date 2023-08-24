@@ -25,17 +25,30 @@ const EditorPage = (props) => {
   const reactNavigator = useNavigate();
   const [clients, setClients] = useState([]);
   const [isRoomCreator, setIsRoomCreator] = useState(false);
-  const authState = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState("");
+  const [username, setUsername] = useState("");
+  // const authState = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    if (authState.isLoggedIn === false) {
-      reactNavigator("/");
-    }
-  }, [authState]);
+  // useEffect(() => {
+  //   if (authState.isLoggedIn === false) {
+  //     reactNavigator("/");
+  //   }
+  // }, [authState]);
 
   useEffect(() => {
     document.title = props.title;
   }, [props.title]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (!token || !user) {
+      navigate("/");
+    }
+    setUserData(user);
+    setUsername(user.name);
+  }, [userData]);
 
   useEffect(() => {
     const init = async () => {

@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuidV4 } from "uuid";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const CreateRoom = () => {
+const CreateRoom = (props) => {
   const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState("");
   const [username, setUsername] = useState("");
+  const [userData, setUserData] = useState("");
+
+  useEffect(() => {
+    document.title = props.title;
+  }, [props.title]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (!token || !user) {
+      navigate("/");
+    }
+    setUserData(user);
+    setUsername(user.name);
+  }, [userData]);
+
   const createNewRoomId = (e) => {
     e.preventDefault();
     const id = uuidV4();

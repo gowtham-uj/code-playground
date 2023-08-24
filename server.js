@@ -30,9 +30,6 @@ const {
   invalidPathHandler,
 } = require("./middlewares/error-handler-middlewares.js");
 
-const server = http.createServer(app);
-const io = new Server(server);
-
 app.use(
   cors({
     origin: "*",
@@ -78,6 +75,9 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
+const server = http.createServer(app);
+const io = new Server(server);
+
 /*
 all the socket stuff starts from here
 */
@@ -119,7 +119,7 @@ io.on("connection", (socket) => {
   });
   socket.on(ACTIONS.CREATE_ROOM, async ({ roomId, username }) => {
     // console.log("creating a room in db to make it persistent");
-    console.log("create room");
+    console.log("create room executing");
     try {
       let room = await Room.create({
         roomId: roomId,

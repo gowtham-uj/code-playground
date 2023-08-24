@@ -62,12 +62,22 @@ export default function SignIn(props) {
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
   const [errorsArray, setErrorsArray] = useState([]);
+  const [userData, setUserData] = useState("");
   const [isErrors, setIsErrors] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
 
   const displayError = [];
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (token || user) {
+      navigate("/home");
+    }
+    setUserData(user);
+  }, [userData]);
 
   useEffect(() => {
     document.title = props.title;
@@ -154,6 +164,7 @@ export default function SignIn(props) {
         })
       );
       const user = setLocalStorage("user", token.msg);
+      const authToken = setLocalStorage("token", token.msg.jwtToken);
 
       navigate("/home", {
         state: {

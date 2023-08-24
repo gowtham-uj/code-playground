@@ -61,7 +61,7 @@ export default function Editor({
 
   let [selectLangOptions, setSelectLangOptions] = useState([]);
   // let [selectedOptions, setSelectedOptions] = useState(null);
-  let [selectedValue, setSelectedValue] = useState("javascript-16.3.0");
+  let [selectedValue, setSelectedValue] = useState("");
 
   useEffect(() => {
     async function init() {
@@ -115,7 +115,6 @@ export default function Editor({
       });
 
       socketRef.current.on(ACTIONS.AVAILABLE_LANGUAGES_LIST, ({ data }) => {
-        console.log(data);
         let denoJavascriptElement = null;
         let nodeJsOption = null;
         data.forEach((element, index) => {
@@ -129,9 +128,18 @@ export default function Editor({
         });
         delete data[denoJavascriptElement];
         data[nodeJsOption].isDefault = true;
+        setEditorLang(data[nodeJsOption].language);
+        setEditorLangVer(data[nodeJsOption].version);
+        onCodeChange({
+          code: null,
+          language: data[nodeJsOption].language,
+          version: data[nodeJsOption].version,
+        });
+        setSelectedValue(
+          `${data[nodeJsOption].language}-${data[nodeJsOption].version}`
+        );
         setSelectLangOptions(data);
-
-        socketRef.current.emit(ACTIONS.SYNC_PREV_ROOM_STATE, roomId);
+        // socketRef.current.emit(ACTIONS.SYNC_PREV_ROOM_STATE, roomId);
       });
 
       socketRef.current.on(ACTIONS.UPDATE_CODE_LANGUAGE, ({ language }) => {
@@ -146,9 +154,9 @@ export default function Editor({
       });
 
       socketRef.current.on(ACTIONS.INITIAL_SYNC_DATA, (roomState) => {
-        console.log(roomState);
+        // console.log(roomState);
         if (!!roomState.roomLanguage) {
-          console.log("hello1");
+          // console.log("hello1");
           let procLang = roomState.roomLanguage.split("-");
           onCodeChange({
             code: null,
@@ -158,13 +166,13 @@ export default function Editor({
           setSelectedValue(roomState.roomLanguage);
         }
         if (!!roomState.codeChanges) {
-          console.log("hello2");
+          // console.log("hello2");
           editorRef.current.focus();
           editorRef.current.setValue(roomState.codeChanges);
           editorRef.current.setCursor(editorRef.current.lineCount(), 0);
         }
         if (!!roomState.codeOutput) {
-          console.log("hello3");
+          // console.log("hello3");
           setCodeOutput(roomState.codeOutput);
         }
       });
@@ -236,7 +244,7 @@ export default function Editor({
                 <option
                   value={`${el.language}-${el.version}`}
                   key={uuid()}
-                  // selected={el.language === "javascript" ? true : false}
+                  // defaultValue={el.isDefault === true ? true : false}
                 >
                   {`${el.language} (${el.version})`}
                 </option>
@@ -244,11 +252,6 @@ export default function Editor({
             })}
           </motion.select>
         </div>
-
-        {/* <div>languages</div>
-        <div>languages</div>
-        <div>languages</div>
-        div>languages</.div> */}
       </div>
       <div className="editor-wrapper">
         <textarea id={editorInstanceId}></textarea>
