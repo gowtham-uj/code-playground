@@ -43,7 +43,7 @@ const EditorPage = (props) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
-    if (!token || !user) {
+    if (!token && !user) {
       navigate("/");
     }
     setUserData(user);
